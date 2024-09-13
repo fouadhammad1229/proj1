@@ -1,6 +1,7 @@
 #include <iostream>
 #include <stdio.h>
 #include <vector>
+#include <sstream>
 using namespace std;
 
 int counterWords(string str)
@@ -58,9 +59,14 @@ int main()
 
 	string str;
 
-	getline(cin, str);
+	while (getline(cin,str)) {
+		if (counterWords(str) == 0) {
+			cout << "========" << endl;
+		}
+		else {
 
-	cout << counterWords(str) << ": words in total." << endl;
-
+		cout << counterWords(str) << ": words in total." << endl;
+	 	}
+	}
 	return 0;
 }
