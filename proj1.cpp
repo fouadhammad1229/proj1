@@ -4,6 +4,25 @@
 #include <sstream>
 using namespace std;
 
+int letterCount(string str) {
+
+	// Count the amount of letters in a text
+	
+	int letters[26]{0};
+
+	for (int i = 0; i < str.length(); i++) {
+		letters[toupper(str[i]) - 65] += 1; // Add 1 to element holding a letter
+	}
+
+	for (int i = 0; i < 26; i++) {
+		if(letters[i] > 0) {
+			cout << char(65 + i) << ": Showed Up: " << letters[i] << endl;
+		}
+	}
+	return 0;
+}
+
+
 int counterWords(string str)
 {
 	// When the string is empty or null, return to 0.
@@ -34,19 +53,6 @@ int counterWords(string str)
 	}
 
 
-	// Count the amount of letters in a text
-	
-	int letters[26]{0};
-
-	for (int i = 0; i < str.length(); i++) {
-		letters[toupper(str[i]) - 65] += 1; // Add 1 to element holding a letter
-	}
-
-	for (int i = 0; i < 26; i++) {
-		if(letters[i] > 0) {
-			cout << char(65 + i) << ": Showed Up: " << letters[i] << endl;
-		}
-	}
 
 	return counter;
 
@@ -59,14 +65,18 @@ int main()
 
 	string str;
 
-	while (getline(cin,str)) {
-		if (counterWords(str) == 0) {
-			cout << "========" << endl;
+	
+	while(getline(cin,str)) {
+		cout << "Total " << counterWords(str) << " different characters, " << counterWords(str) << " most used characters: " << endl;
+	
+		if (letterCount(str) <= 0 || counterWords(str) <= 0) {
+			cout << "" << endl;
 		}
-		else {
+		else {		
+			cout << letterCount(str) << endl;
+		}
 
-		cout << counterWords(str) << ": words in total." << endl;
-	 	}
 	}
+			
 	return 0;
 }
