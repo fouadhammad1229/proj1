@@ -1,5 +1,4 @@
 #include <iostream>
-#include <stdio.h>
 #include <vector>
 #include <sstream>
 #include <map>
@@ -9,13 +8,13 @@
 
 using namespace std;
 
-// Struct to hold the results and manage output order
+// Struct to hold results for sorting
 struct Result {
     string value;
     int count;
     int index;
 
-    // For sorting results: higher count first, and for the same count, earlier index.
+    // Sorting by higher count first, and for the same count, by earlier index
     bool operator<(const Result& other) const {
         if (count != other.count)
             return count > other.count;
@@ -23,120 +22,106 @@ struct Result {
     }
 };
 
-// Helper function to output the top N results
+// Function to output the top N results
 void outputResults(const string& title, map<string, int>& counts, int topN) {
     vector<Result> results;
     int idx = 0;
 
-    if (counts.size() == 0) {
-        return; // Don't print anything if there are no results to display
-    }
+    // If no results, return without printing anything
+    if (counts.empty()) return;
 
-    // Move the map contents into a vector of Result structs for sorting
+    // Transfer map data into a vector for sorting
     for (const auto& entry : counts) {
         results.push_back({entry.first, entry.second, idx++});
     }
 
-    // Sorts the results
+    // Sort the results by count and index
     sort(results.begin(), results.end());
 
-    // Outputs the results for display in terminal
-    cout << "Total " << counts.size() << " different " << title << ", " << min((int)counts.size(), topN) << " most used " << title << ":\n";
+    // Output the top N sorted results
+    cout << "Total " << counts.size() << " different " << title << ", " 
+         << min((int)counts.size(), topN) << " most used " << title << ":\n";
     for (int i = 0; i < min((int)results.size(), topN); ++i) {
-        cout << "No. " << i << ": " << results[i].value << "\t" << results[i].count << endl;
+     // Handle special characters for better readability
+        string displayValue = results[i].value;
+        if (displayValue == "\n") {
+            displayValue = "\\n";
+        } else if (displayValue == " ") {
+            displayValue = " ";
+        }
+        cout << "No. " << i << ": " << displayValue << "\t" << results[i].count << endl;
+	}
+}
+
+// Function to count and store characters
+void letterCount(const string& str, map<string, int>& charCount) {
+    for (char ch : str) {
+        if (ch == ' ' || ch == '\n' || isalnum(ch) || ispunct(ch)) {
+            charCount[string(1, ch)]++;
+        }
     }
 }
 
-// Function to count letters in the input
-int letterCount(string str) {
-    map<string, int> charCount;
-    
-    // Actually counts the letters in a string
-    for (int i = 0; i < str.length(); i++) {
-        charCount[string(1, str[i])]++; // Count each character!! specifically!!
-    }
-
-    // Output the character counts
-    outputResults("characters", charCount, 10);
-    return charCount.size(); // Return total unique characters
-}
-
-// Function to count words in the input
-int counterWords(string str) {
-    map<string, int> wordCount;
+// Function to count and store words
+void counterWords(const string& str, map<string, int>& wordCount) {
     string token;
-    for (int i = 0; i < str.size(); i++) {
-        if (isalpha(str[i])) {
-            token += tolower(str[i]); // Collect word (lowercase included)
+    for (char ch : str) {
+        if (isalpha(ch)) {
+            token += tolower(ch); // Convert letters to lowercase
         } else {
             if (!token.empty()) {
                 wordCount[token]++;
-                token.clear(); // Clear after counting the word
+                token.clear(); // Clear after processing a word
             }
         }
     }
-
+    // Handle the last word, if any
     if (!token.empty()) {
         wordCount[token]++;
     }
-
-    // Output the word counts
-    outputResults("words", wordCount, 10);
-    return wordCount.size(); // Return total unique words
 }
 
-// Function to count numbers in the input
-int counterNumbers(string str) {
-    map<string, int> numberCount;
+// Function to count and store numbers
+void counterNumbers(const string& str, map<string, int>& numberCount) {
     string token;
-    for (int i = 0; i < str.size(); i++) {
-        if (isdigit(str[i])) {
-            token += str[i]; // Collect number
+    for (char ch : str) {
+        if (isdigit(ch)) {
+            token += ch; // Collect digits
         } else {
             if (!token.empty()) {
                 numberCount[token]++;
-                token.clear(); // Clear after counting the number
+                token.clear(); // Clear after processing a number
             }
         }
     }
-
+    // Handle the last number, if any
     if (!token.empty()) {
         numberCount[token]++;
     }
-
-    // Output the number counts
-    outputResults("numbers", numberCount, 10);
-    return numberCount.size(); // Return total unique numbers
 }
 
 // Main function
 int main() {
     string str;
+    map<string, int> charCount, wordCount, numberCount;
 
-    // Reading input from the user
+    // Reading input from the user line by line
     while (getline(cin, str)) {
-        map<string, int> charCount, wordCount, numberCount;
+        str += '\n';
+	
+	// Count characters, words, and numbers in the input
+        letterCount(str, charCount);
+        counterWords(str, wordCount);
+        counterNumbers(str, numberCount);
+    }
 
-        // Count characters, words, and numbers
-        int charTotal = letterCount(str);
-        int wordTotal = counterWords(str);
-        int numberTotal = counterNumbers(str);
+    // Output the top 10 characters, words, and numbers
+    outputResults("characters", charCount, 10);
+    cout << endl;
+    outputResults("words", wordCount, 10);
+    cout << endl;
+    outputResults("numbers", numberCount, 10);
 
-        // Output results for characters
-        if (charTotal > 0) {
-            outputResults("characters", charCount, 10);
-        }
-
-        // Output results for words
-        if (wordTotal > 0) {
-            outputResults("words", wordCount, 10);
-        }
-
-        // Output results for numbers
-        if (numberTotal > 0) {
-            outputResults("numbers", numberCount, 10);
-        }
-    }    
     return 0;
 }
 
